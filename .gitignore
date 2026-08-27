@@ -1,0 +1,26 @@
+# Foundry
+out/
+cache/
+broadcast/
+docs/book/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Coverage
+lcov.info
+coverage/
+lcov-report/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Node (not used; keep ignored)
+node_modules/
