@@ -24,6 +24,8 @@ interface IStrategy {
     ) external;
 
     /// @notice Return underlying to `to`. May return less than requested on loss.
+    /// @dev AtlasVault credits the observed token delta into `idleAssets`, not this return
+    ///      value. Implementations should still return the amount actually transferred.
     /// @param assets Amount requested.
     /// @param to Recipient of withdrawn underlying.
     /// @return withdrawn Amount actually sent.

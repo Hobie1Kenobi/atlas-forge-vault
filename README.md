@@ -28,6 +28,8 @@ ERC1967 proxy ──delegatecall──► AtlasVault (UUPS)
 
 See [docs/threat-model.md](docs/threat-model.md) and [docs/adr-001-erc4626-offset.md](docs/adr-001-erc4626-offset.md).
 
+Internal review notes (not an audit): [docs/findings/README.md](docs/findings/README.md).
+
 ## Install and test
 
 Requires [Foundry](https://book.getfoundry.sh/getting-started/installation).
@@ -49,7 +51,7 @@ Locked in `test/Invariant.t.sol`, `test/Inflation.t.sol`, `test/Vault.t.sol`, `t
 2. **Rounding** — deposit rounding favors the vault.
 3. **Donation / inflation** — a raw donation cannot steal from a subsequent depositor beyond rounding dust; credited donations are bound by the decimals offset.
 4. **Auth** — only the timelock upgrades or `setStrategy`.
-5. **Pause** — deposits and harvest revert; withdrawals succeed.
+5. **Pause** — deposits and harvest revert; withdrawals succeed; `allocate` still succeeds (A5-001).
 6. **Reentrancy** — strategy cannot reenter vault `deposit`.
 
 ## Admin powers

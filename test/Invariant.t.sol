@@ -9,6 +9,8 @@ import { MockYieldStrategy } from "../src/demo/MockYieldStrategy.sol";
 import { MockERC20 } from "../src/demo/MockERC20.sol";
 
 /// @dev Stateful fuzzer over the accounting heart: deposit/withdraw/allocate/harvest/donate.
+///      Handler selectors are precondition-gated and must not revert (`fail_on_revert = true`).
+///      See `docs/findings/A5-002-invariant-fail-on-revert.md`.
 contract VaultHandler is Test {
     AtlasVault public vault;
     MockERC20 public asset;
@@ -54,9 +56,8 @@ contract VaultHandler is Test {
         amount = bound(amount, 1, 10_000e18);
         asset.mint(user, amount);
         vm.prank(user);
-        try vault.deposit(amount, user) {
-            ghostDeposited += amount;
-        } catch { }
+        vault.deposit(amount, user);
+        ghostDeposited += amount;
     }
 
     function mintShares(
@@ -69,9 +70,8 @@ contract VaultHandler is Test {
         if (preview == 0 || preview > 10_000e18) return;
         asset.mint(user, preview);
         vm.prank(user);
-        try vault.mint(shares, user) returns (uint256 paid) {
-            ghostDeposited += paid;
-        } catch { }
+        uint256 paid = vault.mint(shares, user);
+        ghostDeposited += paid;
     }
 
     function withdraw(
@@ -83,9 +83,8 @@ contract VaultHandler is Test {
         if (maxW == 0) return;
         amount = bound(amount, 1, maxW);
         vm.prank(user);
-        try vault.withdraw(amount, user, user) {
-            ghostWithdrawn += amount;
-        } catch { }
+        vault.withdraw(amount, user, user);
+        ghostWithdrawn += amount;
     }
 
     function redeem(
@@ -97,9 +96,8 @@ contract VaultHandler is Test {
         if (bal == 0) return;
         shares = bound(shares, 1, bal);
         vm.prank(user);
-        try vault.redeem(shares, user, user) returns (uint256 assets) {
-            ghostWithdrawn += assets;
-        } catch { }
+        uint256 assets = vault.redeem(shares, user, user);
+        ghostWithdrawn += assets;
     }
 
     function allocate(
@@ -109,7 +107,7 @@ contract VaultHandler is Test {
         if (idle == 0) return;
         amount = bound(amount, 1, idle);
         vm.prank(harvester);
-        try vault.allocate(amount) { } catch { }
+        vault.allocate(amount);
     }
 
     function harvest(
@@ -120,11 +118,8 @@ contract VaultHandler is Test {
         if (yieldAmount > 0) strategy.demoAccrue(yieldAmount);
         minOut = bound(minOut, 0, yieldAmount);
         vm.prank(harvester);
-        try vault.harvest(minOut) returns (uint256 gained) {
-            ghostYield += gained;
-        } catch {
-            // Slippage revert: pending yield remains queued and is not in totalAssets.
-        }
+        uint256 gained = vault.harvest(minOut);
+        ghostYield += gained;
     }
 
     function donate(

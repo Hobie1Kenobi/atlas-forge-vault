@@ -75,6 +75,7 @@ contract AtlasVault is
     error InsufficientLiquidity(uint256 available, uint256 requested);
     error LossMismatch(uint256 actualRemaining, uint256 expectedRemaining);
     error CapTooLow(uint256 cap, uint256 totalAssets_);
+    error AllocateTransferMismatch(uint256 expected, uint256 pulled);
 
     event StrategyUpdated(address indexed previous, address indexed current);
     event DepositCapUpdated(uint256 previous, uint256 current);
@@ -260,6 +261,7 @@ contract AtlasVault is
     }
 
     /// @notice Deploy idle underlying into the attached strategy.
+    /// @dev Intentionally not paused. See `docs/findings/A5-001-allocate-while-paused.md`.
     /// @param assets Amount of idle assets to deploy.
     function allocate(
         uint256 assets
@@ -270,11 +272,15 @@ contract AtlasVault is
         if (address(s) == address(0)) revert NoStrategy();
         if (assets > $.idleAssets) revert InsufficientIdle($.idleAssets, assets);
 
-        $.idleAssets -= assets;
         IERC20 token = IERC20(asset());
+        uint256 beforeBal = token.balanceOf(address(this));
+        $.idleAssets -= assets;
         token.forceApprove(address(s), assets);
         s.deposit(assets);
         token.forceApprove(address(s), 0);
+        uint256 afterBal = token.balanceOf(address(this));
+        uint256 pulled = beforeBal > afterBal ? beforeBal - afterBal : 0;
+        if (pulled != assets) revert AllocateTransferMismatch(assets, pulled);
 
         emit Allocated(assets);
     }
@@ -307,6 +313,7 @@ contract AtlasVault is
     }
 
     /// @notice Pull all recoverable assets from the strategy into idle. Does not detach it.
+    /// @dev Credits the observed token delta, not `IStrategy.withdraw`'s return value.
     function emergencyWithdrawFromStrategy() external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant {
         AtlasVaultStorage storage $ = _vaultStorage();
         IStrategy s = $.strategy;
@@ -315,8 +322,7 @@ contract AtlasVault is
         uint256 reported = s.totalAssets();
         uint256 withdrawn = 0;
         if (reported != 0) {
-            withdrawn = s.withdraw(reported, address(this));
-            $.idleAssets += withdrawn;
+            withdrawn = _creditObservedWithdraw(s, reported);
         }
         emit EmergencyWithdrawn(address(s), withdrawn);
     }
@@ -409,7 +415,7 @@ contract AtlasVault is
         super._withdraw(caller, receiver, owner, assets, shares);
     }
 
-    /// @dev Pull from the strategy if idle is insufficient.
+    /// @dev Pull from the strategy if idle is insufficient. Credits observed token delta.
     function _ensureLiquidity(
         uint256 assets
     ) internal {
@@ -419,9 +425,21 @@ contract AtlasVault is
         if (address(s) == address(0)) revert InsufficientLiquidity($.idleAssets, assets);
 
         uint256 needed = assets - $.idleAssets;
-        uint256 withdrawn = s.withdraw(needed, address(this));
-        $.idleAssets += withdrawn;
+        _creditObservedWithdraw(s, needed);
         if ($.idleAssets < assets) revert InsufficientLiquidity($.idleAssets, assets);
+    }
+
+    /// @dev Call `strategy.withdraw` and credit `idleAssets` by tokens actually received.
+    function _creditObservedWithdraw(
+        IStrategy s,
+        uint256 requested
+    ) internal returns (uint256 withdrawn) {
+        IERC20 token = IERC20(asset());
+        uint256 beforeBal = token.balanceOf(address(this));
+        s.withdraw(requested, address(this));
+        uint256 afterBal = token.balanceOf(address(this));
+        withdrawn = afterBal > beforeBal ? afterBal - beforeBal : 0;
+        _vaultStorage().idleAssets += withdrawn;
     }
 
     function _assetsUntilCap() internal view returns (uint256) {
