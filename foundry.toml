@@ -12,6 +12,8 @@ evm_version = "cancun"
 ffi = false
 fs_permissions = [{ access = "read", path = "./" }]
 gas_reports = ["AtlasVault"]
+# Next.js app is not Solidity. Keep forge build/fmt off web/.
+skip = ["web/**"]
 remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
     "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
@@ -51,6 +53,7 @@ number_underscore = "thousands"
 quote_style = "double"
 tab_width = 4
 wrap_comments = true
+ignore = ["web/**"]
 
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"

@@ -8,6 +8,7 @@ docs/book/
 .env
 .env.*
 !.env.example
+!web/.env.example
 *.pem
 *.key
 
@@ -22,5 +23,8 @@ lcov-report/
 .vscode/
 *.swp
 
-# Node (not used; keep ignored)
+# Node / Next.js (web/)
 node_modules/
+web/.next/
+web/out/
+web/.turbo/

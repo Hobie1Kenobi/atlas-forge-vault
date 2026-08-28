@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light;
+  --ink: #111;
+  --muted: #555;
+  --bg: #f4f1ea;
+  --card: #fff;
+  --line: #cfc8b8;
+  --warn: #fff3bf;
+  --warn-ink: #7d2d0b;
+  --pause: #ffe3e3;
+  --ok: #d3f9d8;
+  --err: #ffe0e0;
+  --pending: #fff4e0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-size: 13px;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.banner {
+  background: var(--warn);
+  border: 2px solid var(--warn-ink);
+  color: var(--warn-ink);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.banner strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.paused {
+  background: var(--pause);
+  border: 2px solid #c92a2a;
+  color: #7a1212;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+  width: 180px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 8px 0;
+}
+
+input[type="text"] {
+  flex: 1;
+  min-width: 220px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  font: inherit;
+}
+
+button {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid #333;
+  background: #eee;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: #111;
+  color: #fff;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono {
+  word-break: break-all;
+}
+
+.status {
+  padding: 8px 10px;
+  margin-top: 8px;
+  border: 1px solid var(--line);
+}
+
+.status.pending {
+  background: var(--pending);
+}
+
+.status.success {
+  background: var(--ok);
+}
+
+.status.error {
+  background: var(--err);
+}
+
+.note {
+  color: var(--muted);
+  margin: 4px 0 0;
+}

@@ -100,6 +100,10 @@ Not gas-golfed. UUPS + AccessControl + idle book are accepted costs. Re-run loca
 
 **Not deployed** on any testnet or mainnet. `script/Deploy.s.sol` broadcasts a proxy + 48h timelock. If `ASSET` is unset it deploys labeled demo `MockERC20` + `MockYieldStrategy` for local rehearsal only.
 
+## Local demo UI
+
+A minimal Next.js page under `web/` talks to that local Anvil deploy (connect, read the vault, deposit/withdraw). Demo only — not production, not mainnet, not a farm, not TVL. How to `anvil` → deploy → `pnpm dev`: [web/README.md](web/README.md).
+
 ## Honest limitations
 
 - Not audited. Not a live strategy. No oracle, no production yield source.
