@@ -2,6 +2,8 @@
 
 **Status:** v1 architecture, not an audit report. No audit has been performed. This document describes intended trust boundaries and residual risk so a reviewer can map tests to code.
 
+Internal A5 notes (not a paid audit, not Trail of Bits): [docs/findings/README.md](findings/README.md).
+
 **Scope:** `AtlasVault` + `IStrategy` + OpenZeppelin `TimelockController` (48h). `MockYieldStrategy` / `MockERC20` are demo/test doubles and are **out of the production threat model**.
 
 ## System boundary
@@ -74,7 +76,7 @@ The vault believes `IStrategy.totalAssets()`. A malicious or buggy strategy can:
 | --- | --- |
 | `deposit` / `mint` / `harvest` | Revert (`maxDeposit`/`maxMint` = 0, `whenNotPaused`) |
 | `withdraw` / `redeem` | **Succeed** |
-| `allocate` | Not paused (moves idle only; harvester) |
+| `allocate` | Not paused (moves idle only; harvester). Locked by `test_A5_001_allocateSucceedsWhilePaused`. |
 
 This exists so a queued malicious upgrade plus a panic-pause cannot trap users.
 

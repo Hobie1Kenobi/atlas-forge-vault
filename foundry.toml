@@ -24,7 +24,9 @@ runs = 256
 [profile.default.invariant]
 runs = 64
 depth = 25
-fail_on_revert = false
+# Handler is precondition-gated; unexpected vault reverts fail the suite.
+# See docs/findings/A5-002-invariant-fail-on-revert.md.
+fail_on_revert = true
 call_override = false
 
 [profile.intense]
@@ -38,7 +40,7 @@ runs = 5000
 [profile.intense.invariant]
 runs = 256
 depth = 50
-fail_on_revert = false
+fail_on_revert = true
 
 [fmt]
 bracket_spacing = true
