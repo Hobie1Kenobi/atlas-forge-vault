@@ -370,7 +370,7 @@ export function AtlasApp() {
                       (share decimals = asset + 6 = {shareDecimals})
                     </span>
                   )}
-                  {shareAssets !== undefined && (
+                  {isConnected && shareAssets !== undefined && (
                     <div className="muted">
                       convertToAssets(shares) ={" "}
                       {fmtAmount(shareAssets, assetDecimals)}
