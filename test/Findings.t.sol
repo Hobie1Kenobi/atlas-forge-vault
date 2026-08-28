@@ -45,9 +45,12 @@ contract FindingsTest is Fixture {
 
         _deposit(alice, 100e18);
         uint256 priceBefore = vault.convertToAssets(1e18);
+        uint256 idle = vault.idleAssets();
 
-        lying.setReported(100e18 + 1000e18);
-        assertEq(vault.totalAssets(), 100e18 + 1000e18);
+        lying.setReported(1000e18);
+        // Idle book is unchanged; NAV still follows the strategy's report.
+        assertEq(vault.idleAssets(), idle);
+        assertEq(vault.totalAssets(), idle + 1000e18);
         assertGt(vault.convertToAssets(1e18), priceBefore);
     }
 
@@ -104,7 +107,7 @@ contract FindingsTest is Fixture {
         vm.prank(harvester);
         vault.allocate(8e18);
 
-        _timelockCall(address(vault), abi.encodeCall(AtlasVault.emergencyWithdrawFromStrategy, ()));
+        _timelockCall(address(vault), abi.encodeCall(AtlasVault.emergencyWithdrawFromStrategy, ()), bytes32(uint256(1)));
         assertEq(vault.idleAssets(), 0);
         assertEq(asset.balanceOf(address(liar)), 8e18);
     }

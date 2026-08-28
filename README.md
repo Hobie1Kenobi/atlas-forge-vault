@@ -67,16 +67,17 @@ Locked in `test/Invariant.t.sol`, `test/Inflation.t.sol`, `test/Vault.t.sol`, `t
 
 ## Tests
 
-`forge test` on this revision: **47 passed, 1 skipped** (optional fork, skipped without `ETH_RPC_URL`).
+`forge test` on this revision: **58 passed, 1 skipped** (optional fork, skipped without `ETH_RPC_URL`).
 
 | File | What it locks | Result |
 | --- | --- | --- |
 | `Vault.t.sol` | deposit/mint/withdraw/redeem, cap, pause, auth, harvest gain/zero/slippage, migration, loss write-off, initializer disabled, fee-on-transfer reject | 30 passed |
+| `Findings.t.sol` | A5 review: accepted-design locks + Low accounting regressions | 11 passed |
 | `Inflation.t.sol` | donation does not inflate; victim funds bound; offset hypothesis | 4 passed |
 | `Reentrancy.t.sol` | malicious strategy and token | 4 passed |
 | `Upgrade.t.sol` | V2 namespaced storage does not collide; delay enforced | 4 passed |
 | `Fuzz.t.sol` | random deposit/withdraw/allocate | 4 passed, 256 runs each |
-| `Invariant.t.sol` | stateful handler on the accounting heart | 64 runs, 1600 calls, **0 reverts**, 5 invariants |
+| `Invariant.t.sol` | stateful handler on the accounting heart (`fail_on_revert = true`) | 64 runs, 1600 calls, **0 reverts**, 5 invariants |
 | `fork/Fork.t.sol` | skipped unless `ETH_RPC_URL` is set | 1 skipped |
 
 Coverage (`forge coverage --report summary`): **AtlasVault 100% lines / 98.5% statements / 89% branches**. That is accounting + auth, not a vanity global %. Deploy script is untested on purpose (no broadcast in CI).

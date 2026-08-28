@@ -50,10 +50,18 @@ abstract contract Fixture is Test {
         address target,
         bytes memory data
     ) internal {
+        _timelockCall(target, data, bytes32(0));
+    }
+
+    function _timelockCall(
+        address target,
+        bytes memory data,
+        bytes32 salt
+    ) internal {
         vm.prank(proposer);
-        timelock.schedule(target, 0, data, bytes32(0), bytes32(0), TIMELOCK_DELAY);
+        timelock.schedule(target, 0, data, bytes32(0), salt, TIMELOCK_DELAY);
         vm.warp(block.timestamp + TIMELOCK_DELAY);
-        timelock.execute(target, 0, data, bytes32(0), bytes32(0));
+        timelock.execute(target, 0, data, bytes32(0), salt);
     }
 
     function _mintApprove(
